@@ -32,6 +32,12 @@
   color: white;
 }
 
+.vote-text {
+  font-size: 25px;
+  color: white;
+  margin-bottom: 0px;
+}
+
 .gradient-text {
   background: -webkit-linear-gradient(left, #60c657 30%, #35aee2 60%);
   background-clip: text;
@@ -52,6 +58,23 @@
   color: white;
 }
 
+.vote-button {
+  height: 16px;
+  border: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+  width: auto;
+  border-radius: 100%;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  background: -webkit-linear-gradient(left, #275ea5, #7e1728);
+  background-size: 200% 200%;
+  animation: gradient-animation 4s ease infinite;
+  margin-left: 10px;
+}
+
 .connect-wallet-button {
   background: -webkit-linear-gradient(left, #60c657, #35aee2);
   background-size: 200% 200%;
@@ -63,6 +86,14 @@
   background-size: 200% 200%;
   animation: gradient-animation 4s ease infinite;
   margin-left: 10px;
+}
+
+.tip-button {
+  background: -webkit-linear-gradient(left, #a52794, #1e177e);
+  background-size: 200% 200%;
+  animation: gradient-animation 4s ease infinite;
+  margin: auto;
+  width: 100px;
 }
 
 .footer-container {
