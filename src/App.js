@@ -8,7 +8,7 @@ import { Provider, Program, web3, BN } from '@project-serum/anchor';
 
 import kp from './keypair.json'
 
-const { SystemProgram, Keypair } = web3
+const { SystemProgram } = web3
 
 const arr = Object.values(kp._keypair.secretKey)
 const secret = new Uint8Array(arr)
@@ -24,18 +24,13 @@ const opts = {
 const TWITTER_HANDLE = '_buildspace';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
-const TEST_GIFS = [
-  'https://media.giphy.com/media/ROcSJHrOhhBkc/giphy.gif',
-  'https://media.giphy.com/media/tOE2zmvxYZod2/giphy.gif',
-  'https://media.giphy.com/media/3ohzdVwYXahU2HhHNe/giphy.gif',
-  'https://media.giphy.com/media/3d8mQWANXGDdJAM6t0/giphy.gif',
-  'https://media.giphy.com/media/idRrg9aowbpK9QYD0P/giphy.gif'
-]
-
 const App = () => {
   const [walletAddress, setWalletAddress] = useState(null)
   const [inputValue, setIntputValue] = useState('')
   const [gifList, setGifList] = useState(null)
+  const [sendingTx, setSendingTx] = useState(false)
+  const [solAmount, setSolAmount] = useState(0.01)
+  const [tipAddress, setTipAddress] = useState('')
 
   const getProvider = () => {
     const connection = new Connection(network, opts.preflightCommitment);
@@ -150,6 +145,31 @@ const App = () => {
     }
   }
 
+  const openTip = (toAddress) => {
+    setTipAddress(toAddress)
+    setSendingTx(true)
+  }
+
+  const tip = async () => {
+    try {
+      const provider = getProvider()
+      const transaction = new web3.Transaction().add(
+        web3.SystemProgram.transfer({
+          fromPubkey: provider.wallet.publicKey,
+          toPubkey: tipAddress,
+          lamports: web3.LAMPORTS_PER_SOL * solAmount
+        })
+      )
+
+      const signature = await provider.send(transaction)
+      console.log('Send transaction: ', signature)
+      setSolAmount(0.01)
+      setSendingTx(false)
+    } catch {
+      console.error('Failed sending transaction to: ', tipAddress)
+    }
+  }
+
   const getMarmotness = (votes) => {
     if (votes.length === 0) return '--'
     const marmotVotes = votes.filter(vote => vote.isMarmot)
@@ -196,6 +216,23 @@ const App = () => {
       )
     } else {
       return (<div className="connected-container">
+        {sendingTx &&
+          <div className="transaction-modal">
+            <div className="close-modal" onClick={() => setSendingTx(false)}>X</div>
+            <div className="modal-container">
+              <p className="sub-text">Send</p>
+              <input type="number" value={solAmount} min={0} step={0.01} onChange={(e) => {
+                setSolAmount(e.value)
+              }} />
+              <p className="sub-text">SOL to</p>
+              <p className="sub-text">{tipAddress.toString()}</p>
+              <button
+                className="tip-button cta-button"
+                onClick={() => tip()}
+              >Send</button>
+            </div>
+          </div>
+        }
         <input
           type="text"
           placeholder="Enter gif link!"
@@ -223,7 +260,10 @@ const App = () => {
                 <p className="sub-text">
                   Marmotness: {getMarmotness(gif.marmotness)}
                 </p>
-                <button className="cta-button tip-button">Tip</button>
+                <button
+                  className="cta-button tip-button"
+                  onClick={() => openTip(gif.userAddress)}
+                >Tip</button>
               </div>
             ))
           }
@@ -244,13 +284,13 @@ const App = () => {
       console.log('Fetching GIF list...')
       getGifList()
     }
+    // eslint-disable-next-line
   }, [walletAddress])
 
   return (
     <div className="App">
       <div className="container">
         <div className={walletAddress ? 'authed-container' : 'container'}>
-
           <div className="header-container">
             <p className="header">Only Marmots</p>
             <p className="sub-text">

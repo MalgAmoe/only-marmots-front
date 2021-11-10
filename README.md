@@ -1,5 +1,8 @@
 # buildspace Solana GIF Portal Project
 
+Cool project to learn some solana code!!!
+React code is horrible in this project sorry :-)
+
 ### **Welcome 👋**
 To get started with this course, clone this repo and follow these commands:
 
